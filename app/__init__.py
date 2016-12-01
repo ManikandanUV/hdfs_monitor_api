@@ -7,5 +7,9 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 db = SQLAlchemy(app)
 
 
+from app.v1 import v1
+
+app.register_blueprint(v1)
+
 if __name__ == '__main__':
     app.run(debug=True)
