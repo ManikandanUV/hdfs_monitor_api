@@ -1,5 +1,6 @@
 from app import db
 
+
 class Base(db.Model):
     __abstract__ = True
 
@@ -14,5 +15,3 @@ class Monitors(Base):
 
     def __init__(self, dir_name):
         self.dir_name = dir_name
-
-
