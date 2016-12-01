@@ -2,6 +2,8 @@ import logging
 import os
 import sys
 
+DEBUG = True
+
 LOGGING = dict(
     version=1,
     disable_existing_loggers=False,
@@ -52,7 +54,7 @@ TEST_PASSWORD = os.environ.get('TEST_PASSWORD')
 
 # Define the database - we are working with
 # SQLite for this example
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'app.db')
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join('/home/mramakri/', 'hdfs_monitor.db')
 # SQLALCHEMY_DATABASE_URI = 'postgresql://' + PG_USER + ':' + PG_PASSWORD + '@' + PG_HOST + ':5432/audience_db'
 DATABASE_CONNECT_OPTIONS = {}
 
