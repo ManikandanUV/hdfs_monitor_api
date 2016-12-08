@@ -25,7 +25,7 @@ class AddMonitor(Resource):
         models.db.session.commit()
         return {"message": "Monitor added successfully!",
                 "record": {"id": new_monitor.id,
-                           "path": new_monitor.dir_name}}, 200
+                           "path": new_monitor.dir_path}}, 200
 
 
 @api.route('/rem_monitor')
@@ -36,6 +36,6 @@ class RemoveMonitor(Resource):
         rem_monitor = models.Monitors.query.filter_by(id=(int(api.payload['id']))).first()
         if rem_monitor is None:
             return {"error": "ID not found"}, 404
-        models.db.session.delete(rem_monitor)
+        rem_monitor.is_active = False
         models.db.session.commit()
         return {"message": str(rem_monitor.id) + " removed successfully!"}, 200
