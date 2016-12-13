@@ -39,3 +39,16 @@ class RemoveMonitor(Resource):
         rem_monitor.is_active = False
         models.db.session.commit()
         return {"message": str(rem_monitor.id) + " removed successfully!"}, 200
+
+
+@api.route('/get_monitors')
+class GetMonitors(Resource):
+    def get(self):
+        active_monitors = models.Monitors.query.filter_by(is_active=True).all()
+        print(active_monitors)
+        if active_monitors is None:
+            return {"error": "no active monitors found"}, 404
+        active_monitor_list = []
+        for monitor in active_monitors:
+            active_monitor_list.append({'id': monitor.id, 'dir_path': monitor.dir_path})
+        return {"active_monitors": active_monitor_list}, 200
