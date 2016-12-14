@@ -32,10 +32,9 @@ class Messages(Base):
     filename = db.Column(db.String, nullable=False)
     message = db.Column(db.String, nullable=False)
 
-    def __init__(self, date_created, date_modified, dir_id, filename, message):
+    def __init__(self, date_created, dir_id, filename, message):
 
         self.date_created = date_created
-        self.date_modified = date_modified
         self.dir_id = dir_id
         self.filename = filename
         self.message = message
