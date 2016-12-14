@@ -13,6 +13,13 @@ rem_monitor_format = api.model('Remove Monitor', {
     "id": fields.Integer(description="Monitored directory id", required=True)
 })
 
+message_log_format = api.model('Log Message', {
+    "timestamp": fields.DateTime(description="Event timestamp", required=True),
+    "dir_id": fields.Integer(description="Monitored directory id", required=True),
+    "filename": fields.String(description="File name only", required=True),
+    "message": fields.String(description="Message published", required=True)
+})
+
 
 @api.route('/add_monitor')
 class AddMonitor(Resource):
@@ -52,3 +59,18 @@ class GetMonitors(Resource):
         for monitor in active_monitors:
             active_monitor_list.append({'id': monitor.id, 'dir_path': monitor.dir_path})
         return {"active_monitors": active_monitor_list}, 200
+
+
+@api.route('/log_message')
+class LogMessage(Resource):
+    @api.response(200, 'Message Log Created')
+    @api.expect(message_log_format, validate=True)
+    def post(self):
+        new_message = models.Messages(date_created=api.payload['timestamp'],
+                                      dir_id=api.payload['dir_id'],
+                                      filename=api.payload['filename'],
+                                      message=api.payload['message'])
+        models.db.session.add(new_message)
+        models.db.session.commit()
+        return {"message": "event id #" + new_message.id + " logged successfully"}, 200
+
