@@ -1,5 +1,7 @@
+import datetime
+
 from flask import Blueprint
-from flask_restplus import Resource, Api, fields
+from flask_restplus import Resource, Api, fields, reqparse
 from app import models
 
 v1 = Blueprint('v1', __name__, url_prefix='/hdfs_monitor/v1')
@@ -32,7 +34,7 @@ class AddMonitor(Resource):
         models.db.session.commit()
         return {"message": "Monitor added successfully!",
                 "record": {"id": new_monitor.id,
-                           "path": new_monitor.dir_path}}, 200
+                           "path": new_monitor.dir_path}}, 201
 
 
 @api.route('/rem_monitor')
@@ -61,16 +63,42 @@ class GetMonitors(Resource):
         return {"active_monitors": active_monitor_list}, 200
 
 
-@api.route('/log_message')
+@api.route('/log_event')
 class LogMessage(Resource):
-    @api.response(200, 'Message Log Created')
+    @api.response(200, 'Event Log Created')
     @api.expect(message_log_format, validate=True)
     def post(self):
-        new_message = models.Messages(date_created=api.payload['timestamp'],
+        event_timestamp = datetime.datetime.strptime(api.payload['timestamp'], "%Y-%m-%d %H:%M:%S.%f")
+        new_message = models.Messages(date_created=event_timestamp,
                                       dir_id=api.payload['dir_id'],
                                       filename=api.payload['filename'],
                                       message=api.payload['message'])
         models.db.session.add(new_message)
         models.db.session.commit()
-        return {"message": "event id #" + new_message.id + " logged successfully"}, 200
+        response = {"message": "event id #" + str(new_message.id) + " logged successfully"}
+        code = 201
+        return response, code
 
+
+@api.route('/get_events')
+class GetEvents(Resource):
+    @api.doc(params={'dir_id': 'Monitor ID',
+                     'max_events': 'Maximum number of events'})
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('dir_id', type=int, required=True)
+        parser.add_argument('max_events', type=int)
+        args = parser.parse_args()
+
+        if int(args['dir_id']) < 0:
+            response = {'error': 'invalid monitor id ' + args['dir_id']}
+            code = 400
+            return response, code
+
+        if int(args['max_events']) < 1:
+            response = {'error': 'invalid max_events size ' + args['max_events']}
+            code = 400
+            return response, code
+
+        dir_events = models.Messages.query.filter_by(dir_id=args['dir_id']).limit(args['max_events']).all()
+        return dir_events

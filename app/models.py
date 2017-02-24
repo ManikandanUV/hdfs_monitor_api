@@ -5,8 +5,8 @@ class Base(db.Model):
     __abstract__ = True
 
     id = db.Column(db.BigInteger, primary_key=True)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+    date_created = db.Column(db.DateTime, default=db.func.localtimestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.localtimestamp(),
                               onupdate=db.func.current_timestamp())
 
 
